@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { T } from "../libs/types/common";
 import { MemberInput, LoginInput, Member } from "../libs/types/member";
 import MemberService from "../models/Member.service";
-import Errors, { HttpCode } from "../libs/errors";
+import Errors, { HttpCode, Message } from "../libs/errors";
 import AuthService from "../models/Auth.service";
 import { AUTH_TIMER } from "../libs/config";
 
@@ -58,6 +58,24 @@ memberController.login = async (req: Request, res: Response) => {
     // Agar err biz hosil qilgan class ichidagi errolardan bolsa jsonga ogirib uni qayta jonatadi
     if (err instanceof Errors) res.status(err.code).json(err);
     // customized error classda mavjud bolmagan error bolsa shu qator ishlaydi
+    else res.status(Errors.standart.code).json(Errors.standart);
+  }
+};
+
+memberController.verifyAuth = async (req: Request, res: Response) => {
+  try {
+    let member = null;
+    const token = req.cookies["accessToken"];
+    if (token) member = await authService.checkAuth(token);
+
+    if (!member)
+      throw new Errors(HttpCode.UNAUTHORIZED, Message.NOT_AUTHENTICATED);
+
+    console.log("member:", member);
+    res.status(HttpCode.OK).json({ member: member });
+  } catch (err) {
+    console.log("Error on verifyAuth", err);
+    if (err instanceof Errors) res.status(err.code).json(err);
     else res.status(Errors.standart.code).json(Errors.standart);
   }
 };

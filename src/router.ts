@@ -3,9 +3,13 @@ import memberController from "./controllers/member.controller";
 
 const router = express.Router();
 
-// router.get("/", memberController.goHome);
+/** Member API*/
+router.post("/member/login", memberController.login);
+router.post("member/signup", memberController.signup);
+router.get("/member/detail", memberController.verifyAuth);
 
-router.post("/login", memberController.login);
-router.post("/signup", memberController.signup);
+/** Product API */
+
+/** Order API */
 
 export default router;
