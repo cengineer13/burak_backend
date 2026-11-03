@@ -2,8 +2,9 @@ import { Request, Response } from "express";
 import { T } from "../libs/types/common";
 import { MemberInput, LoginInput, Member } from "../libs/types/member";
 import MemberService from "../models/Member.service";
-import Errors from "../libs/errors";
+import Errors, { HttpCode } from "../libs/errors";
 import AuthService from "../models/Auth.service";
+import { AUTH_TIMER } from "../libs/config";
 
 const memberService = new MemberService();
 const authService = new AuthService(); // Token classidan olamiz
@@ -17,10 +18,15 @@ memberController.signup = async (req: Request, res: Response) => {
 
     const input: MemberInput = req.body,
       result: Member = await memberService.signup(input);
-    // TODO: tokens
-    const token = await authService.createToken(result);
 
-    res.json({ member: result });
+    // Tokens
+    const token = await authService.createToken(result);
+    res.cookie("accessToken", token, {
+      maxAge: AUTH_TIMER * 3600 * 1000,
+      httpOnly: false,
+    });
+
+    res.status(HttpCode.CREATED).json({ member: result, accessToken: token });
   } catch (err) {
     console.log("Error on User signup Process:", err);
 
@@ -34,16 +40,18 @@ memberController.signup = async (req: Request, res: Response) => {
 memberController.login = async (req: Request, res: Response) => {
   try {
     console.log("Process User Login");
-    console.log("POST: input user login req body:", req.body);
-
     const input: LoginInput = req.body,
       result = await memberService.login(input);
 
-    // TODO: tokens
+    // Tokens
     const token = await authService.createToken(result);
-    // console.log("token:", token);
 
-    res.json({ member: result });
+    res.cookie("accessToken", token, {
+      maxAge: AUTH_TIMER * 3600 * 1000,
+      httpOnly: false,
+    });
+
+    res.status(HttpCode.OK).json({ member: result, accessToken: token });
   } catch (err) {
     console.log("Error on User login process:", err);
 

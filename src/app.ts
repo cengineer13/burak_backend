@@ -9,6 +9,8 @@ import session from "express-session";
 import ConnectMongoDBSession from "connect-mongodb-session";
 import { T } from "./libs/types/common";
 
+import cookieParser from "cookie-parser";
+
 const MongoDBStore = ConnectMongoDBSession(session);
 const store = new MongoDBStore({
   uri: String(process.env.MONGO_URL),
@@ -24,6 +26,8 @@ app.use(express.json());
 app.use(morgan(MORGAN_FORMAT));
 
 // 2 - Sessions
+
+// 2.1 - Session-coockie orqali
 app.use(
   session({
     secret: String(process.env.SESSION_SECRET), // Session qurishda ishlatiladigan loyiha kodi
@@ -43,6 +47,9 @@ app.use(function (req, res, next) {
   res.locals.member = sessionInstance.member;
   next();
 });
+
+// 2.1 JWT TOken orqali Sessions
+app.use(cookieParser());
 
 // 3- Views
 app.set("views", path.join(__dirname, "views"));
