@@ -192,3 +192,25 @@ function countChars(text:string): Record<string, number> {
 const string_v = "hello";
 const result_v = countChars(string_v);
 console.log(string_v, "so'zida harflarning takrorlanish soni ", result_v, `\n`);
+
+
+
+console.log("============== TASK W ==============");
+console.log(`Arrayni berilgan uzunlikda bo'laklarga ajratib qaytarsin.
+Masalan: chunkArray([1, 2, 3, 4, 5], 2) return [[1, 2], [3, 4], [5]]\n`);
+
+function chunkArray <T>(arr: T[number], size: number): T[][] {
+  if (size <= 0) return [];
+
+  const result: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) {
+    result.push(arr.slice(i, i + size));
+  }
+  return result;
+}
+
+console.log(chunkArray([1, 2, 3, 4, 5], 2)); 
+// Natija: [[1, 2], [3, 4], [5]]
+
+console.log(chunkArray(['a', 'b', 'c', 'd'], 3)); 
+// Natija: [['a', 'b', 'c'], ['d']]

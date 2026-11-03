@@ -39,15 +39,31 @@
 # print("\n")
 
 
-
 print("============== TASK V ==============")
 print("""Stringdagi har bir harf necha marta takrorlanganini object sifatida qaytarsin.
-Masalan: countChars("hello") return {h: 1, e: 1, l: 2, o: 1}""")
+Masalan: countChars("hello") return {h: 1, e: 1, l: 2, o: 1}\n""")
+
 
 def countChars(string):
     new_dict = {}
     i = 1
     for letter in string:
         new_dict[letter] = new_dict.get(letter, 0) + 1
+    return new_dict
+char_v = "hello"
+result_v = countChars(char_v)
+print(f"{char_v} so'zida harflarning qaytarilish natijasi: {result_v}\n")
 
-countChars("hello")
+print("============== TASK W ==============")
+print("""Arrayni berilgan uzunlikda bo'laklarga ajratib qaytarsin.
+Masalan: chunkArray([1, 2, 3, 4, 5], 2) return [[1, 2], [3, 4], [5]]\n""")
+
+def chunkArray(array:list, size:int):
+    if size <=0:
+        return 0
+    return [array[i:i+size] for i in range(0, len(array), size)]
+
+array_w = [1, 2, 3, 4, 5]
+result_w = chunkArray(array_w, 3)
+print(f"{array_w} bo'laklarga bo'linganda natija {result_w}\n" )
+
