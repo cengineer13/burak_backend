@@ -47,10 +47,15 @@ export interface LoginInput {
   memberPassword: string;
 }
 
-
 export interface AdminRequests extends Request {
   member: Member;
   session: Session & { member: Member }; // Coockie va memberga oid malumoatlar
+  file: Express.Multer.File;
+  files: Express.Multer.File[];
+}
+
+export interface ExtendedRequest extends Request {
+  member: Member;
   file: Express.Multer.File;
   files: Express.Multer.File[];
 }
