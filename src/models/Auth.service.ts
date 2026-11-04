@@ -37,6 +37,7 @@ class AuthService {
     console.log(`--- [AUTH] memberNick: ${result.memberNick}------`);
     return result;
   }
+
 }
 
 export default AuthService;
