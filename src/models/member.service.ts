@@ -1,5 +1,10 @@
 import { HttpCode, Message } from "../libs/errors";
-import { LoginInput, Member, MemberInput, MemberUpdateInput } from "../libs/types/member";
+import {
+  LoginInput,
+  Member,
+  MemberInput,
+  MemberUpdateInput,
+} from "../libs/types/member";
 import MemberModel from "../schema/Member.model";
 import Errors from "../libs/errors";
 import { MemberStatus, MemberType } from "../libs/enums/member.enum";
@@ -37,7 +42,7 @@ class MemberService {
       .findOne(
         {
           memberNick: input.memberNick,
-          memberStatus: { $ne: MemberStatus.DELETE }
+          memberStatus: { $ne: MemberStatus.DELETE },
         },
         { memberNick: 1, memberPassword: 1, memberStatus: 1 },
       )
@@ -46,10 +51,8 @@ class MemberService {
     // agar member DB da mavjud bo'lmasa Error qilamiz va uni controler catchga uzatamiz
     if (!member) throw new Errors(HttpCode.NOT_FOUND, Message.NO_MEMBER_NICK);
     else if (member.memberStatus === MemberStatus.BLOCK) {
-      throw new Errors(HttpCode.FORBIDDEN, Message.BLOCKED_USER)
+      throw new Errors(HttpCode.FORBIDDEN, Message.BLOCKED_USER);
     }
-
-
 
     // agar input pw bn DB dagi hashlanga pw bir xilligni tekshirish
     const isMatch = await bcrypt.compare(
@@ -62,6 +65,29 @@ class MemberService {
       throw new Errors(HttpCode.UNAUTHORIZED, Message.WRONG_PASSWORD);
     console.log("Tizimga muvaffaqiyatli login bo'lindi!");
     return await this.memberModel.findById(member._id).lean().exec();
+  }
+
+  public async getMemberDetail(member: Member): Promise<Member> {
+    const memberId = shapeIntoMongooseObjectId(member._id);
+    const result = await this.memberModel
+      .findOne({ _id: memberId, memberStatus: MemberStatus.ACTIVE })
+      .exec();
+
+    if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+    return result;
+  }
+
+  public async updateMember(
+    member: Member,
+    input: MemberUpdateInput,
+  ): Promise<Member> {
+    const memberId = shapeIntoMongooseObjectId(member._id);
+    const result = await this.memberModel
+      .findOneAndUpdate({ _id: memberId }, input, { new: true })
+      .exec();
+
+    if (!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
+    return result;
   }
 
   /** SSR */
@@ -116,7 +142,7 @@ class MemberService {
     return await this.memberModel.findById(member._id).exec();
   }
 
-  // Userlarni olish 
+  // Userlarni olish
   public async getUsers(): Promise<Member[]> {
     const result = await this.memberModel
       .find({ memberType: MemberType.USER })
@@ -134,18 +160,6 @@ class MemberService {
       .exec();
 
     if (!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
-    return result;
-  }
-  
-
-  public async getMemberDetail(member: Member): Promise<Member> {
-    const memberId = shapeIntoMongooseObjectId(member._id);
-    const result = await this.memberModel.findOne(
-      {_id: memberId, 
-        memberStatus: MemberStatus.ACTIVE})
-        .exec();
-    
-    if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND)
     return result;
   }
 }

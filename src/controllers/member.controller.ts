@@ -5,6 +5,7 @@ import {
   LoginInput,
   Member,
   ExtendedRequest,
+  MemberUpdateInput,
 } from "../libs/types/member";
 import MemberService from "../models/Member.service";
 import Errors, { HttpCode, Message } from "../libs/errors";
@@ -80,15 +81,33 @@ memberController.logout = async (req: ExtendedRequest, res: Response) => {
   }
 };
 
-memberController.getMemberDetail = async (req: ExtendedRequest, res: Response) => {
+memberController.getMemberDetail = async (
+  req: ExtendedRequest,
+  res: Response,
+) => {
   try {
     console.log("getMemberDetail!");
     const result = await memberService.getMemberDetail(req.member);
 
     res.status(HttpCode.OK).json(result);
-
   } catch (err) {
     console.log("Error on getMemberDetail", err);
+
+    if (err instanceof Errors) res.status(err.code).json(err);
+    else res.status(Errors.standart.code).json(Errors.standart);
+  }
+};
+
+memberController.updateMember = async (req: ExtendedRequest, res: Response) => {
+  try {
+    console.log("on updateMember! controller");
+    const input: MemberUpdateInput = req.body;
+    if (req.file) input.memberImage = req.file.path.replace(/\\/, "/");
+
+    const result = await memberService.updateMember(req.member, input);
+    res.status(HttpCode.OK).json(result);
+  } catch (err) {
+    console.log("Error on updateMember", err);
 
     if (err instanceof Errors) res.status(err.code).json(err);
     else res.status(Errors.standart.code).json(Errors.standart);
@@ -104,8 +123,7 @@ memberController.verifyAuth = async (
   try {
     let member = null;
     const token = req.cookies["accessToken"];
-
-    if (!token || token === "null" || req.member) {
+    if (!token || token === "null") {
       throw new Errors(HttpCode.UNAUTHORIZED, Message.NOT_AUTHENTICATED);
     }
     if (token) req.member = await authService.checkAuth(token);
@@ -114,7 +132,9 @@ memberController.verifyAuth = async (
   } catch (err) {
     console.log("Error on verifyAuth", err);
     if (err instanceof Errors) res.status(err.code).json(err);
-    else res.status(HttpCode.UNAUTHORIZED)
+    else
+      res
+        .status(HttpCode.UNAUTHORIZED)
         .json(new Errors(HttpCode.UNAUTHORIZED, Message.NOT_AUTHENTICATED));
   }
 };
