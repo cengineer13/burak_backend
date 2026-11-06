@@ -46,14 +46,15 @@ restaurantController.processSignup = async (
 ) => {
   try {
     console.log("Process Signup");
-    // Requestdan file ni olish 
+    // Requestdan file ni olish
     const file = req.file;
-    if (!file) throw new Errors(HttpCode.BAD_REQUEST, Message.SOMETHING_WENT_WRONG);
+    if (!file)
+      throw new Errors(HttpCode.BAD_REQUEST, Message.SOMETHING_WENT_WRONG);
     //Yangi member hosil qilish
     const newMember: MemberInput = req.body;
-    newMember.memberImage = file?.path.replace(/\\/g, '/');;
+    newMember.memberImage = file?.path.replace(/\\/g, "/");
     newMember.memberType = MemberType.RESTAURANT;
-    console.log("file:", file)
+    console.log("file:", file);
 
     const result = await memberService.processSignup(newMember);
     // Sessions - part
@@ -61,7 +62,6 @@ restaurantController.processSignup = async (
     // session succesfully browser ichidagi coockie ga sid nijoylaydi/
     // Shuningdek DB sessions collectioniga joylab keyingi browserga response qaytaradi
     req.session.save(function () {
-
       res.redirect("/admin/product/all");
       console.log("Sign Up Done");
     });
@@ -81,7 +81,6 @@ restaurantController.processLogin = async (
 ) => {
   try {
     console.log("Process Login");
-
 
     const input: LoginInput = req.body;
 
@@ -140,10 +139,9 @@ restaurantController.getUsers = async (req: Request, res: Response) => {
     console.log(result);
 
     res.render("users", { users: result });
-
   } catch (err) {
     console.log("Error on getUsers:", err);
-    res.redirect("/admin/login")
+    res.redirect("/admin/login");
   }
 };
 
@@ -152,33 +150,29 @@ restaurantController.updateChosenUser = async (req: Request, res: Response) => {
     console.log("updateChosenUser page");
     const result = await memberService.updateChosenUser(req.body);
     res.status(HttpCode.OK).json({ data: result });
-
   } catch (err) {
     console.log("Error on updateChosenUser:", err);
     // Agar err biz hosil qilgan class ichidagi errolardan bir bolsa jsonga ogirib uni qayta jonatadi
     if (err instanceof Errors) res.status(err.code).json(err);
     // customized error classda mavjud bolmagan error bolsa standart errorni yuboradi
     else res.status(Errors.standart.code).json(Errors.standart);
-
   }
 };
-
 
 restaurantController.verifyRestaurant = (
   req: AdminRequests,
   res: Response,
-  next: NextFunction) => {
-
+  next: NextFunction,
+) => {
   if (req.session?.member?.memberType === MemberType.RESTAURANT) {
     req.member = req.session.member;
     next();
-  }
-  else {
-    const message = Message.NOT_AUTHENTICATED
+  } else {
+    const message = Message.NOT_AUTHENTICATED;
     res.send(
-      `<script> alert('${message}'); window.location.replace('/admin/login')</script>`);
+      `<script> alert('${message}'); window.location.replace('/admin/login')</script>`,
+    );
   }
 };
-
 
 export default restaurantController;
