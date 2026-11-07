@@ -1,4 +1,3 @@
-import { token } from "morgan";
 import { AUTH_TIMER } from "../libs/config";
 import { Member } from "../libs/types/member";
 import jwt from "jsonwebtoken";
