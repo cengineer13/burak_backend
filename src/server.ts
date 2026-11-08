@@ -13,7 +13,6 @@ mongoose
       console.info(
         `The server is running succesfully on port: https://localhost:${PORT}`,
       );
-      console.info(`Admin project on http://localhost:${PORT}/admin \n`);
     });
   })
   .catch((err) => console.log("ERROR on connection Mongo DB ", err));
