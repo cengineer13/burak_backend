@@ -38,3 +38,8 @@ export interface OrderInquiry {
   limit: number;
   orderStatus: OrderStatus;
 }
+
+export interface OrderUpdateInput {
+  orderId: String;
+  orderStatus: OrderStatus;
+}
