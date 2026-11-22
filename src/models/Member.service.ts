@@ -118,8 +118,7 @@ class MemberService {
 
   public async addUserPoint(member: Member, point: number): Promise<Member> {
     const memberId = shapeIntoMongooseObjectId(member._id);
-
-    return await this.memberModel
+    const result = await this.memberModel
       .findOneAndUpdate(
         {
           _id: memberId,
@@ -130,6 +129,8 @@ class MemberService {
         { new: true },
       )
       .exec();
+    if (!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
+    return result;
   }
 
   /** SSR */

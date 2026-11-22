@@ -1,10 +1,10 @@
+import cors from "cors";
 import express from "express";
 import path from "path";
 import router from "./router";
 import routerAdmin from "./router-admin";
 import morgan from "morgan";
 import { MORGAN_FORMAT } from "./libs/config";
-
 import session from "express-session";
 import ConnectMongoDBSession from "connect-mongodb-session";
 import { T } from "./libs/types/common";
@@ -24,6 +24,12 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static("./uploads"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(
+  cors({
+    credentials: true,
+    origin: true,
+  }),
+);
 app.use(morgan(MORGAN_FORMAT));
 
 // 2 - Sessions
